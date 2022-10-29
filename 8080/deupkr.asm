@@ -1,6 +1,9 @@
-;; upkr 8080 decoder by Ivan Gorodetsky 2022-10-24
+;; upkr 8080 decoder by Ivan Gorodetsky
 ;; based on z80 version by Peter "Ped" Helcmanovsky (C) 2022, licensed same as upkr project ("unlicensed")
 ;; to assemble use The Telemark Assembler (TASM) 3.2
+;;
+;; v1 -  2022-10-24
+;; v2 -  2022-10-29 (-2 bytes)
 ;;
 ;; public API:
 ;;         HL = packed data, DE = destination
@@ -12,12 +15,12 @@
 
 ;#DEFINE UPKR_UNPACK_SPEED        ; uncomment to get larger but faster unpack routine
 
-;forward version - 227 bytes
-;forward fast version - 257 bytes
+;forward version - 225 bytes
+;forward fast version - 255 bytes
 ;compress forward with <--z80> option
 
-;backward version - 226 bytes
-;backward fast version - 256 bytes
+;backward version - 224 bytes
+;backward fast version - 254 bytes
 ;compress backward with <--z80 -r> options
 
 NUMBER_BITS     .equ     16+15       ; context-bits per offset/length (16+15 for 16bit offsets/pointers)
@@ -25,7 +28,7 @@ NUMBER_BITS     .equ     16+15       ; context-bits per offset/length (16+15 for
 
 ; reserve space for probs array
 ; you can define UPKR_PROBS_ORIGIN to specific 256 byte aligned address for probs array (320 bytes),
-#define UPKR_PROBS_ORIGIN 0F000h
+#define UPKR_PROBS_ORIGIN 0FA00h
 probs      .equ ((UPKR_PROBS_ORIGIN) + 255) & -$100     ; probs array aligned to 256
 probs_real_c:    .equ 1 + 255 + 1 + (2*NUMBER_BITS)             ; real size of probs array
 probs_c:         .equ (probs_real_c + 1) & -2                      ; padding to even size (required by init code)
@@ -78,10 +81,7 @@ copy_chunk:
 		dcx d
 		mov a,d
 		ora e
-		jnz NotExit
-		pop b
-		ret
-NotExit:
+		jz Exit
 		xchg
 		shld offset+1
 		xchg
@@ -225,6 +225,7 @@ bit_is_0_2:
 		sub e
 		stax b
 		add d
+Exit:
 		pop d
 		ret
 
