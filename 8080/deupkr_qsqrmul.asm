@@ -1,6 +1,9 @@
-;; upkr 8080 decoder with quarter square multiplication by Ivan Gorodetsky 2022-10-25
+;; upkr 8080 decoder with quarter square multiplication by Ivan Gorodetsky
 ;; based on z80 version by Peter "Ped" Helcmanovsky (C) 2022, licensed same as upkr project ("unlicensed")
 ;; to assemble use The Telemark Assembler (TASM) 3.2
+;;
+;; v1 -  2022-10-25
+;; v2 -  2022-10-29 (-2 bytes)
 ;;
 ;; public API:
 ;;
@@ -16,10 +19,10 @@
             ; initial HL points at last byte of compressed data
             ; initial DE points at last byte of unpacked data
 
-;forward version - 290 bytes
+;forward version - 288 bytes
 ;compress forward with <--z80> option
 
-;backward version - 289 bytes
+;backward version - 287 bytes
 ;compress backward with <--z80 -r> options
 
 NUMBER_BITS     .equ     16+15       ; context-bits per offset/length (16+15 for 16bit offsets/pointers)
@@ -81,10 +84,7 @@ copy_chunk:
 		dcx d
 		mov a,d
 		ora e
-		jnz NotExit
-		pop b
-		ret
-NotExit:
+		jz Exit
 		xchg
 		shld offset+1
 		xchg
@@ -228,6 +228,7 @@ bit_is_0_2:
 		sub e
 		stax b
 		add d
+Exit:
 		pop d
 		ret
 
