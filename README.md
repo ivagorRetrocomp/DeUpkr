@@ -1,4 +1,4 @@
 # DeUpkr
-Intel 8080 decompressors for Upkr compressor:
+Intel 8080 and 8086/88 decompressors for Upkr compressor:
 
 https://github.com/exoticorn/upkr
