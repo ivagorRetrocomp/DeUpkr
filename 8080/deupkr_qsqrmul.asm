@@ -4,6 +4,7 @@
 ;;
 ;; v1 -  2022-10-25
 ;; v2 -  2022-10-29 (-2 bytes)
+;; v3 -  2022-10-31 (-2 bytes)
 ;;
 ;; public API:
 ;;
@@ -19,10 +20,10 @@
             ; initial HL points at last byte of compressed data
             ; initial DE points at last byte of unpacked data
 
-;forward version - 288 bytes
+;forward version - 286 bytes
 ;compress forward with <--z80> option
 
-;backward version - 287 bytes
+;backward version - 285 bytes
 ;compress backward with <--z80 -r> options
 
 NUMBER_BITS     .equ     16+15       ; context-bits per offset/length (16+15 for 16bit offsets/pointers)
@@ -269,8 +270,8 @@ GenSQRtabLoop:
 		inr b
 		stax b
 		dcr b
-		push psw
 		push b
+		push psw
 		mov a,h
 		stax b
 		xchg
@@ -278,15 +279,15 @@ GenSQRtabLoop:
 		dad b
 GenSQRtabA:
 		mvi a,0FFh
-		aci 0
+		adc b
 		sta GenSQRtabA+1
 		xchg
-		pop b
 		pop psw
 		dad d
-		aci 0
+		adc b
+		pop b
 		inr c
 		jnz GenSQRtabLoop
 		ret
 		
-		.end 
+		.end
