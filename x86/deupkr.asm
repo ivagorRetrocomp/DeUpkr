@@ -2,6 +2,7 @@
 ; based on z80 version by Peter "Ped" Helcmanovsky (C) 2022, licensed same as upkr project ("unlicensed") 
 ;
 ; v1 (2022-11-01) - 188 bytes
+; v2 (2022-11-01) - 165 bytes (and about 24% faster)
 ; Memory model - Tiny
 ;
 ; Input:
@@ -77,9 +78,8 @@ decode_byte:
 		mov ch,bh
 		jmp decompress_data
 copy_chunk:
-		mov al,bh
+		cmp bh,ch
 		inc bh
-		cmp al,ch
 		jc SkipCall1
 		call decode_bit
 SkipCall1:
@@ -105,8 +105,8 @@ inc_c_decode_bit:
 		inc bl
 decode_bit:
 		push cx
-		test dx,8000h
-		jnz state_b15_set
+		test dx,dx
+		js state_b15_set
 state_b15_zero:
 		add ah,ah
 		jnz has_bit
@@ -115,50 +115,37 @@ state_b15_zero:
 		adc ah,ah
 has_bit:
 		rcl dx,1
-		test dx,8000h
-		jz state_b15_zero
+		test dx,dx
+		jns state_b15_zero
 state_b15_set:
+		sub cx,cx
 		mov al,[bx]
 		dec al
 		cmp al,dl
 		inc al
-		push bx
-		mov bl,dl
 		push ax
-		pushf
 		jnc bit_is_0
 		neg al
-bit_is_0:
-		mov ch,0
-		mov bh,ch
-
 		mov cl,al
-
-		mul dh
-		add ax,bx
-		popf
-		jnc bit_is_0_2
 		dec ch
-		add ax,cx
-bit_is_0_2:
-		mov dx,ax
+bit_is_0:
+		mul dh
+		mov dh,0
+		add dx,ax
+		add dx,cx
 		pop ax
 		rcr al,1
 		mov cl,3
 		shr al,cl
 		adc al,-16
-		mov cl,al
-		pop bx
-		mov al,[bx]
-		sub al,cl
-		mov [bx],al
-		add al,ch
+		sub [bx],al
+		add ch,[bx]
 		pop cx
 		ret
 
 decode_number:
-		mov cx,0FFFFh
-		clc
+		sub cx,cx
+		dec cx
 		jmp SkipCall2
 decode_number_loop:
 		call inc_c_decode_bit
