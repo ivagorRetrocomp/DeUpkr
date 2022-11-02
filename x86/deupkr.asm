@@ -5,6 +5,9 @@
 ; v2 (2022-11-01) - 165 bytes (and about 24% faster)
 ; Memory model - Tiny
 ;
+; compress forward with <--z80> option
+; compress backward with <--z80 -r> options
+;
 ; Input:
 ; SI=source
 ; DI=destination
