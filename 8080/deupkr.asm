@@ -4,7 +4,7 @@
 ;;
 ;; v1 -  2022-10-24
 ;; v2 -  2022-10-29 (-2 bytes)
-;; v3 -  2022-11-03 (-1 byte and slightly faster)
+;; v3 -  2022-12-03 (-1 byte and slightly faster)
 ;;
 ;; public API:
 ;;         HL = packed data, DE = destination
