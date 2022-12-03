@@ -5,6 +5,7 @@
 ;; v1 -  2022-10-25
 ;; v2 -  2022-10-29 (-2 bytes)
 ;; v3 -  2022-10-31 (-2 bytes)
+;; v4 -  2022-12-03 (-2 bytes and slightly faster)
 ;;
 ;; public API:
 ;;
@@ -20,10 +21,10 @@
             ; initial HL points at last byte of compressed data
             ; initial DE points at last byte of unpacked data
 
-;forward version - 286 bytes
+;forward version - 284 bytes
 ;compress forward with <--z80> option
 
-;backward version - 285 bytes
+;backward version - 283 bytes
 ;compress backward with <--z80 -r> options
 
 NUMBER_BITS     .equ     16+15       ; context-bits per offset/length (16+15 for 16bit offsets/pointers)
@@ -81,6 +82,7 @@ copy_chunk:
 		cmp d
 		cnc decode_bit
 		jnc keep_offset
+		ora a
 		call decode_number
 		dcx d
 		mov a,d
@@ -163,13 +165,10 @@ upkr_data_ptr:
 		xchg
 		adc a
 has_bit:
-		mov d,a
-		adc l
-		sub d
-		mov l,a
-		xra a
-		ora h
-		mov a,d
+		jnc $+4
+		inr l
+		inr h
+		dcr h
 		jp state_b15_zero
 		sta SetA_+1
 state_b15_set:
@@ -178,14 +177,13 @@ state_b15_set:
 		cmp l
 		inr a
 		push b
-		mov c,l
 		push psw
 		jnc bit_is_0
 		cma
 		inr a
 bit_is_0:
+		push h
 		mov e,a
-		push b
 		sub h
 		jnc $+5
 		cma
@@ -235,7 +233,6 @@ Exit:
 
 decode_number:
 		lxi d,0FFFFh
-		ora a
 loop:
 		cc inc_c_decode_bit
 		mov a,d
@@ -290,4 +287,4 @@ GenSQRtabA:
 		jnz GenSQRtabLoop
 		ret
 		
-		.end
+		.end 
