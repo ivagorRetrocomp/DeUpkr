@@ -4,6 +4,7 @@
 ;;
 ;; v1 -  2022-10-24
 ;; v2 -  2022-10-29 (-2 bytes)
+;; v3 -  2022-11-03 (-1 byte and slightly faster)
 ;;
 ;; public API:
 ;;         HL = packed data, DE = destination
@@ -15,12 +16,12 @@
 
 ;#DEFINE UPKR_UNPACK_SPEED        ; uncomment to get larger but faster unpack routine
 
-;forward version - 225 bytes
-;forward fast version - 255 bytes
+;forward version - 224 bytes
+;forward fast version - 254 bytes
 ;compress forward with <--z80> option
 
-;backward version - 224 bytes
-;backward fast version - 254 bytes
+;backward version - 223 bytes
+;backward fast version - 253 bytes
 ;compress backward with <--z80 -r> options
 
 NUMBER_BITS     .equ     16+15       ; context-bits per offset/length (16+15 for 16bit offsets/pointers)
@@ -77,6 +78,7 @@ copy_chunk:
 		cmp d
 		cnc decode_bit
 		jnc keep_offset
+		ora a
 		call decode_number
 		dcx d
 		mov a,d
@@ -159,13 +161,10 @@ upkr_data_ptr:
 		xchg
 		adc a
 has_bit:
-		mov d,a
-		adc l
-		sub d
-		mov l,a
-		xra a
-		ora h
-		mov a,d
+		jnc $+4
+		inr l
+		inr h
+		dcr h
 		jp state_b15_zero
 		sta SetA_+1
 state_b15_set:
@@ -231,7 +230,6 @@ Exit:
 
 decode_number:
 		lxi d,0FFFFh
-		ora a
 loop:
 		cc inc_c_decode_bit
 		mov a,d
@@ -253,4 +251,4 @@ fix_bit_pos:
 		jc fix_bit_pos
 		ret
 		
-		.end 
+		.end
