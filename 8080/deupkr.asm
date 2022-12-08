@@ -5,6 +5,7 @@
 ;; v1 -  2022-10-24
 ;; v2 -  2022-10-29 (-2 bytes)
 ;; v3 -  2022-12-03 (-1 byte and slightly faster)
+;; v4 -  2022-12-08 (-3 bytes and 2% faster with UPKR_UNPACK_SPEED)
 ;;
 ;; public API:
 ;;         HL = packed data, DE = destination
@@ -197,7 +198,7 @@ mul0:
 		mvi d,0
 		mov l,d
 		mov b,d
-		dad h\ jnc $+4\ dad d
+		dad h\ mov l,e 
 		dad h\ jnc $+4\ dad d
 		dad h\ jnc $+4\ dad d
 		dad h\ jnc $+4\ dad d
