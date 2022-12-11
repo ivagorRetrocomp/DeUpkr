@@ -18,11 +18,11 @@
 ;#DEFINE UPKR_UNPACK_SPEED        ; uncomment to get larger but faster unpack routine
 
 ;forward version - 224 bytes
-;forward fast version - 254 bytes
+;forward fast version - 251 bytes
 ;compress forward with <--z80> option
 
 ;backward version - 223 bytes
-;backward fast version - 253 bytes
+;backward fast version - 250 bytes
 ;compress backward with <--z80 -r> options
 
 NUMBER_BITS     .equ     16+15       ; context-bits per offset/length (16+15 for 16bit offsets/pointers)
