@@ -6,6 +6,7 @@
 ;; v2 -  2022-10-29 (-2 bytes)
 ;; v3 -  2022-10-31 (-2 bytes)
 ;; v4 -  2022-12-03 (-2 bytes and slightly faster)
+;; v5 -  2022-12-13 (-1 byte and about 3% faster)
 ;;
 ;; public API:
 ;;
@@ -21,10 +22,10 @@
             ; initial HL points at last byte of compressed data
             ; initial DE points at last byte of unpacked data
 
-;forward version - 284 bytes
+;forward version - 283 bytes
 ;compress forward with <--z80> option
 
-;backward version - 283 bytes
+;backward version - 282 bytes
 ;compress backward with <--z80 -r> options
 
 NUMBER_BITS     .equ     16+15       ; context-bits per offset/length (16+15 for 16bit offsets/pointers)
@@ -182,8 +183,8 @@ state_b15_set:
 		cma
 		inr a
 bit_is_0:
-		push h
 		mov e,a
+		mov c,l
 		sub h
 		jnc $+5
 		cma
@@ -193,20 +194,19 @@ bit_is_0:
 		mvi h,1+(SQRtab>>8)
 		mov b,m
 		dcr h
-		mov c,m
+		mov d,m
 		add e
 		jnc $+5
 		mvi h,2+(SQRtab>>8)
 		mov l,a
 		mov a,m
-		sub c
-		mov c,a
+		sub d
+		mov d,a
 		inr h
 		mov a,m
 		sbb b
 		mov h,a
-		mov l,c
-		pop b
+		mov l,d
 		mvi d,0
 		mov b,d
 		dad b
@@ -287,4 +287,4 @@ GenSQRtabA:
 		jnz GenSQRtabLoop
 		ret
 		
-		.end 
+		.end
