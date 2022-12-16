@@ -6,6 +6,7 @@
 ;; v2 -  2022-10-29 (-2 bytes)
 ;; v3 -  2022-12-03 (-1 byte and slightly faster)
 ;; v4 -  2022-12-08 (-3 bytes and 2% faster with UPKR_UNPACK_SPEED)
+;; v5 -  2022-12-13 (slightly faster with UPKR_UNPACK_SPEED)
 ;;
 ;; public API:
 ;;         HL = packed data, DE = destination
@@ -176,12 +177,12 @@ state_b15_set:
 		push b
 		mov c,l
 		push psw
+#IFNDEF UPKR_UNPACK_SPEED
 		jnc bit_is_0
 		cma
 		inr a
 bit_is_0:
 		mov e,a
-#IFNDEF UPKR_UNPACK_SPEED
 		xra a
 		mov d,a
 		mov l,a
@@ -198,7 +199,12 @@ mul0:
 		mvi d,0
 		mov l,d
 		mov b,d
-		dad h\ mov l,e 
+		jnc bit_is_0
+		cma
+		adc d
+bit_is_0:
+		mov e,a
+		dad h\ mov l,e
 		dad h\ jnc $+4\ dad d
 		dad h\ jnc $+4\ dad d
 		dad h\ jnc $+4\ dad d
